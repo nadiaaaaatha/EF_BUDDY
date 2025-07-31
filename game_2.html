@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Clickez</title>
+  <script src="../config.js"></script>
+  <script src="../function.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link href="../custom.css" rel="stylesheet">
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Press Start 2P', monospace, sans-serif;
+      /* background: #2e7d32; */
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #fbbf24 100%);
+      /* Green background */
+      min-height: 100vh;
+      margin: 0;
+      color: #111;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .container {
+      width: 100vw;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 0 40px 0;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      color: #fff;
+      font-size: 2.1em;
+      margin: 0 0 32px 0;
+      letter-spacing: 2px;
+      text-shadow: 2px 3px 0 #000, 0 1px 8px #1b5e20, 0 6px 22px #81c784cc;
+      font-family: 'Press Start 2P', monospace, sans-serif;
+      font-weight: 400;
+      text-align: center;
+    }
+
+    #gameBoard {
+      display: grid;
+      grid-template-columns: repeat(3, 120px);
+      grid-template-rows: repeat(3, 120px);
+      gap: 16px;
+      justify-content: center;
+      align-content: center;
+      margin-bottom: 40px;
+      min-height: 392px;
+      min-width: 392px;
+    }
+
+    .blink-btn {
+      width: 120px;
+      height: 120px;
+      border: 4px solid #ffb74d;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #ffcc80 60%, #ffb74d 100%);
+      transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+      cursor: pointer;
+      outline: none;
+      display: inline-block;
+      font-size: 0;
+      box-shadow: 0 5px 20px #ffb74d66, 0 2px 8px #fff;
+      position: relative;
+    }
+
+    .blink-btn.active {
+      /* background: radial-gradient(circle at 60% 40%, #ffd54f 60%, #ffb300 100%); */
+      /* box-shadow: 0 0 30px #ffd54fcc, 0 2px 8px #fff; */
+      background: #DCDCDC;
+      box-shadow: 0 0 30px #9b9b9b, 0 2px 8px #fff;
+      border-color: #9b9b9b;
+      animation: pop 0.25s;
+    }
+
+    .blink-btn:hover,
+    .blink-btn:focus-visible {
+      /* background: linear-gradient(145deg, #ffe082 60%, #fff59d 100%);
+      box-shadow: 0 0 30px #ffe082bb, 0 2px 8px #fff; */
+      background: #DCDCDC;
+      box-shadow: 0 0 30px #9b9b9b, 0 2px 8px #fff;
+      border-color: #9b9b9b;
+      /* border-color: #fff176; */
+      transform: scale(1.08);
+    }
+
+    @keyframes pop {
+      0% {
+        transform: scale(1.15);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    #bottom-bar {
+      width: 100vw;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      background: transparent;
+      padding-bottom: 20px;
+    }
+
+    #startBtn {
+      padding: 12px 36px;
+      font-size: 1.1em;
+      background: linear-gradient(90deg, #ffb74d 60%, #ffd54f 100%);
+      color: #111;
+      border: none;
+      border-radius: 30px;
+      margin: 0 0 10px 0;
+      box-shadow: 0 2px 8px #ffb74d77;
+      cursor: pointer;
+      font-family: 'Press Start 2P', monospace, sans-serif;
+      font-weight: bold;
+      letter-spacing: 1px;
+      transition: background 0.2s, transform 0.12s;
+      text-shadow: 1px 1px 0 #fff, 0 1px 8px #ffb74d;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #startBtn:hover {
+      background: linear-gradient(90deg, #ffd54f 60%, #ffb74d 100%);
+      transform: scale(1.04);
+    }
+
+    #scoreboard {
+      font-size: 1em;
+      color: #fff;
+      background: #558b2fdd;
+      display: inline-block;
+      padding: 8px 22px;
+      border-radius: 22px;
+      box-shadow: 0 2px 8px #9ccc6588;
+      font-weight: bold;
+      font-family: 'Press Start 2P', monospace, sans-serif;
+      text-shadow: 0 1px 0 #000;
+      text-align: center;
+      margin-bottom: 0;
+    }
+
+    #scoreboard span {
+      margin: 0 12px;
+      font-size: 1em;
+      color: #fff;
+    }
+
+    #info {
+      position: absolute;
+      margin-top: 18px;
+      font-size: 1em;
+      color: #fff;
+      min-height: 24px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-shadow: 0 1px 0 #000;
+      font-family: 'Press Start 2P', monospace, sans-serif;
+      text-align: center;
+    }
+
+    .prop {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="loadingSave" style="display:none;">
+    <div class="spinner-container">
+      <div class="spinner"></div>
+      <p>กำลังบันทึก...</p>
+    </div>
+  </div>
+  <div class="container">
+    <div style="
+    position: absolute;
+    right: 50px;
+    bottom: 50px;
+"><h2>วิธีเล่นเกมส์</h2>ผู้เล่นต้องจำลำดับปุ่มที่สว่างแล้วคลิกตามลำดับนั้น</div>
+    <h1>Clickez</h1>
+    <div id="gameBoard"></div>
+    <p id="info"></p>
+  </div>
+  <div id="bottom-bar">
+    <button id="startBtn">START GAME</button>
+    <div id="scoreboard">
+      <span>SCORE: <span id="score">0</span></span>
+      <span>BEST: <span id="bestScore">0</span></span>
+    </div>
+    <div id="scoreboard" style="margin-top: 20px;">
+      <span>ระดับการประเมิน :<span id="scoreMsg"></span></span>
+    </div>
+  </div>
+  <script>
+    let sequence = [];
+    let userStep = 0;
+    let level = 1;
+    let playing = false;
+    let score = 0;
+    let bestScore = localStorage.getItem('blinkBestScore') ? parseInt(localStorage.getItem('blinkBestScore')) : 0;
+    let buttons = [];
+    const info = document.getElementById('info');
+    const startBtn = document.getElementById('startBtn');
+    const scoreDisplay = document.getElementById('score');
+    const bestScoreDisplay = document.getElementById('bestScore');
+    const gameBoard = document.getElementById('gameBoard');
+
+    bestScoreDisplay.textContent = bestScore;
+
+    function calculateButtons(score) {
+      let base = 2;
+      let max = 9;
+      let add = Math.floor(score / 100);
+      let total = base + add;
+      return total > max ? max : total;
+    }
+
+    function renderButtons() {
+      gameBoard.innerHTML = '';
+      buttons = [];
+      let btnCount = calculateButtons(score);
+      for (let i = 0; i < btnCount; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'blink-btn';
+        btn.setAttribute('aria-label', 'Button ' + (i + 1));
+        btn.addEventListener('click', () => handleUserInput(i));
+        buttons.push(btn);
+        gameBoard.appendChild(btn);
+
+      }
+      // Fill empty grid spots if less than 9 balls, so grid stays centered
+      for (let i = btnCount; i < 9; i++) {
+        const empty = document.createElement('div');
+        empty.style.width = '120px';
+        empty.style.height = '120px';
+        empty.style.display = 'inline-block';
+        gameBoard.appendChild(empty);
+      }
+    }
+
+    function randomBtn() {
+      return Math.floor(Math.random() * buttons.length);
+    }
+
+    function showSequence(seq, i = 0) {
+      if (i >= seq.length) {
+        buttons.forEach(btn => btn.classList.remove('active'));
+        playing = true;
+        info.textContent = "YOUR TURN!";
+        return;
+      }
+      playing = false;
+      buttons[seq[i]].classList.add('active');
+      setTimeout(() => {
+        buttons[seq[i]].classList.remove('active');
+        setTimeout(() => showSequence(seq, i + 1), 400);
+      }, 600);
+    }
+
+    function startGame() {
+      score = 0;
+      level = 1;
+      sequence = [];
+      userStep = 0;
+      scoreDisplay.textContent = score;
+      info.textContent = "";
+      renderButtons();
+      nextLevel();
+    }
+
+    function nextLevel() {
+      info.textContent = `LEVEL ${level}`;
+      renderButtons();
+      sequence.push(randomBtn());
+      showSequence(sequence);
+      userStep = 0;
+      level++;
+    }
+
+    function handleUserInput(idx) {
+      if (!playing) return;
+      buttons[idx].classList.remove('active');
+      if (idx === sequence[userStep]) {
+        userStep++;
+        if (userStep === sequence.length) {
+          score += (level - 1);
+          scoreDisplay.textContent = score;
+          if (score > bestScore) {
+            bestScore = score;
+            bestScoreDisplay.textContent = bestScore;
+            localStorage.setItem('blinkBestScore', bestScore);
+
+          }
+          playing = false;
+          setTimeout(nextLevel, 800);
+        }
+      } else {
+        info.textContent = "WRONG! TRY AGAIN";
+        playing = false;
+        buttons.forEach(btn => btn.classList.remove('active'));
+        bestScoreGame('best_score_2', localStorage.blinkBestScore)
+        // scoreGame(score, 2)
+
+
+        let scoreMsg;
+        let customersLostScore = 0;
+
+        if (score >= 120) {
+          scoreMsg = 'ยอดเยี่ยม';
+          customersLostScore = 7;
+        } else if (score >= 55) {
+          scoreMsg = 'ดีมาก';
+          customersLostScore = 6;
+        } else if (score >= 45) {
+          scoreMsg = 'ดี';
+          customersLostScore = 5;
+        } else if (score >= 28) {
+          scoreMsg = 'พอใช้';
+          customersLostScore = 4;
+        } else if (score >= 15) {
+          scoreMsg = 'ปรับปรุงเล็กน้อย';
+          customersLostScore = 3;
+        } else if (score >= 6) {
+          scoreMsg = 'ปรับปรุงมาก';
+          customersLostScore = 2;
+        } else {
+          scoreMsg = 'แย่';
+          customersLostScore = 1;
+        }
+        scoreGame(customersLostScore, 2)
+
+        document.getElementById('scoreMsg').textContent = scoreMsg;
+      }
+    }
+
+    startBtn.addEventListener('click', startGame);
+    renderButtons();
+  </script>
+</body>
+
+</html>

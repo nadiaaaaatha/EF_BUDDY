@@ -1,0 +1,2056 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EF Buddy - Executive Function Practicing</title>
+    <script src="config.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Kanit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #fbbf24 100%);
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        .screen {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Login Screen */
+        .auth-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .brain-icon {
+            font-size: 5rem;
+            color: #fbbf24;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .logo-section h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 2rem;
+            color: #fbbf24;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 0px #1e3a8a;
+        }
+
+        .logo-section .subtitle {
+            font-family: 'Press Start 2P', cursive;
+            color: #3b82f6;
+            font-size: 0.6rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo-section p {
+            color: #f8fafc;
+            font-size: 0.9rem;
+        }
+
+        .auth-form {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border: 4px solid #fbbf24;
+            box-shadow: 8px 8px 0px #1e3a8a;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #1e3a8a;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #1e3a8a;
+            font-size: 1.2rem;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 3px solid #1e3a8a;
+            font-size: 1rem;
+            background: #f8fafc;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #fbbf24;
+            background: #fffbeb;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1rem;
+            border: 3px solid #1e3a8a;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-family: 'Press Start 2P', cursive;
+            background: linear-gradient(145deg, #fbbf24 0%, #f59e0b 100%);
+            color: #1e3a8a;
+            box-shadow: 4px 4px 0px #1e3a8a;
+        }
+
+        .btn-primary:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #1e3a8a;
+        }
+
+        .auth-link {
+            text-align: center;
+            margin-top: 1rem;
+            color: #64748b;
+        }
+
+        .auth-link a {
+            color: #1e3a8a;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        /* Pet Selection Screen */
+        .pet-selection-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .pet-selection-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .pet-selection-title h2 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.5rem;
+            color: #fbbf24;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 0px #1e3a8a;
+        }
+
+        .pet-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .pet-option {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border: 4px solid #fbbf24;
+            box-shadow: 8px 8px 0px #1e3a8a;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pet-option:hover {
+            transform: translate(4px, 4px);
+            box-shadow: 4px 4px 0px #1e3a8a;
+        }
+
+        .pet-option.selected {
+            border-color: #10b981;
+            box-shadow: 8px 8px 0px #10b981;
+        }
+
+        .pet-option-avatar {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .pet-option-name {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+        }
+
+        .pet-option-desc {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        /* Dashboard */
+        #dashboard {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #fbbf24 100%);
+        }
+
+        .top-bar {
+            background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fbbf24;
+            border-bottom: 4px solid #fbbf24;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar i {
+            font-size: 3rem;
+            color: #fbbf24;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .username {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .user-age {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .stats {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .points-display {
+            background: linear-gradient(145deg, #10b981 0%, #059669 100%);
+            color: #fbbf24;
+            padding: 0.5rem 1rem;
+            border: 2px solid #1e3a8a;
+            font-weight: 700;
+            box-shadow: 2px 2px 0px #1e3a8a;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+        }
+
+        .logout-btn {
+            background: linear-gradient(145deg, #dc2626 0%, #b91c1c 100%);
+            border: 2px solid #1e3a8a;
+            color: #fbbf24;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-weight: 700;
+            box-shadow: 2px 2px 0px #1e3a8a;
+                  font-family: "Press Start 2P", system-ui;
+      font-weight: 400;
+      font-style: normal;
+        }
+        
+
+
+        .main-content {
+            padding: 1.5rem;
+            padding-bottom: 6rem;
+        }
+
+        /* Pet Section */
+        .pet-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border: 4px solid #fbbf24;
+            box-shadow: 8px 8px 0px #1e3a8a;
+            margin-bottom: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .pet-section::before {
+            content: '🐾';
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            font-size: 2rem;
+            background: #fbbf24;
+            border: 3px solid #1e3a8a;
+            padding: 0.5rem;
+            border-radius: 50%;
+        }
+
+        .pet-container {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .pet-avatar-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .pet-avatar {
+            font-size: 6rem;
+            margin-bottom: 1rem;
+            animation: petBounce 3s infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        .pet-outfit {
+            position: absolute;
+            top: 0;
+            left: 0;
+            font-size: 6rem;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        @keyframes petBounce {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .pet-info h3 {
+            color: #1e3a8a;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pet-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .pet-stat {
+            background: linear-gradient(145deg, #3b82f6 0%, #2563eb 100%);
+            color: #fbbf24;
+            padding: 0.5rem;
+            border: 2px solid #1e3a8a;
+            font-weight: 700;
+            font-size: 0.8rem;
+            box-shadow: 2px 2px 0px #1e3a8a;
+        }
+
+        .pet-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .pet-btn {
+            background: linear-gradient(145deg, #10b981 0%, #059669 100%);
+            color: #fbbf24;
+            border: 3px solid #1e3a8a;
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            font-weight: 700;
+            box-shadow: 4px 4px 0px #1e3a8a;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+        }
+
+        .pet-btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #1e3a8a;
+        }
+
+        /* Shop Section */
+        .shop-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border: 4px solid #fbbf24;
+            box-shadow: 8px 8px 0px #1e3a8a;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .shop-section h2 {
+            color: #1e3a8a;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .shop-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .shop-item {
+            background: #e2e8f0;
+            border: 3px solid #1e3a8a;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 4px 4px 0px #64748b;
+        }
+
+        .shop-item-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .shop-item-name {
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+        }
+
+        .shop-item-price {
+            color: #059669;
+            font-weight: 700;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .buy-btn {
+            background: linear-gradient(145deg, #fbbf24 0%, #f59e0b 100%);
+            color: #1e3a8a;
+            border: 2px solid #1e3a8a;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-weight: 700;
+            box-shadow: 2px 2px 0px #1e3a8a;
+            width: 100%;
+        }
+
+        /* Game Modal System (สำหรับเปิดเกมภายนอก) */
+        .game-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(5px);
+        }
+
+        .game-modal-content {
+            position: relative;
+            margin: 2% auto;
+            width: 95%;
+            height: 90%;
+            background-color: #1e3a8a;
+            border: 4px solid #fbbf24;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
+        }
+
+        .game-modal-header {
+            background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #fbbf24;
+        }
+
+        .game-modal-title {
+            color: #fbbf24;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem;
+        }
+
+        .close-game-btn {
+            background: linear-gradient(145deg, #dc2626 0%, #b91c1c 100%);
+            border: 2px solid #fbbf24;
+            color: #fbbf24;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+            box-shadow: 2px 2px 0px #fbbf24;
+        }
+
+        .close-game-btn:hover {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0px #fbbf24;
+        }
+
+        .game-iframe-container {
+            width: 100%;
+            height: calc(100% - 80px);
+            position: relative;
+        }
+
+        .game-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+
+        .loading-game {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fbbf24;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .loading-spinner {
+            border: 4px solid #3b82f6;
+            border-top: 4px solid #fbbf24;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Game Cards */
+        .welcome-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border: 4px solid #fbbf24;
+            box-shadow: 8px 8px 0px #1e3a8a;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .welcome-section h2 {
+            color: #1e3a8a;
+            margin-bottom: 1rem;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem;
+        }
+
+        .games-section h2 {
+            color: #fbbf24;
+            font-size: 1.1rem;
+            font-family: 'Press Start 2P', cursive;
+            text-shadow: 2px 2px 0px #1e3a8a;
+            margin-bottom: 1rem;
+        }
+
+        .ef-games-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .ef-game-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+            border: 4px solid #1e3a8a;
+            box-shadow: 6px 6px 0px #fbbf24;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .ef-game-icon {
+            width: 70px;
+            height: 70px;
+            border: 3px solid #1e3a8a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #1e3a8a;
+            box-shadow: 4px 4px 0px #fbbf24;
+            background: linear-gradient(145deg, #fbbf24 0%, #f59e0b 100%);
+        }
+
+        .ef-game-info {
+            flex: 1;
+        }
+
+        .ef-game-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: #1e3a8a;
+        }
+
+        .ef-game-description {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .play-btn {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #1e3a8a;
+            background: linear-gradient(145deg, #10b981 0%, #059669 100%);
+            color: #fbbf24;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px #1e3a8a;
+        }
+
+        .play-btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #1e3a8a;
+        }
+
+        /* Points Animation */
+        .points-earned {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(145deg, #10b981 0%, #059669 100%);
+            color: #fbbf24;
+            padding: 2rem;
+            border: 4px solid #1e3a8a;
+            box-shadow: 8px 8px 0px #1e3a8a;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            z-index: 1000;
+            animation: pointsPopup 2s ease-out;
+        }
+
+        @keyframes pointsPopup {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .pet-container {
+                flex-direction: column;
+            }
+
+            .ef-game-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .shop-items {
+                grid-template-columns: 1fr;
+            }
+
+            .pet-options {
+                grid-template-columns: 1fr;
+            }
+
+            .game-modal-content {
+                width: 98%;
+                height: 95%;
+                margin: 1% auto;
+            }
+        }
+
+        #loadingModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .spinner-container {
+            text-align: center;
+            color: white;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #ccc;
+            border-top: 6px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Loading Modal -->
+    <div id="loadingModal" style="display:none;">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <p>กรุณารอสักครู่...</p>
+        </div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="screen active">
+        <div class="auth-container">
+            <div class="logo-section">
+                <i class="fas fa-brain brain-icon"></i>
+                <h1>EF BUDDY</h1>
+                <div class="subtitle">EXECUTIVE FUNCTION PRACTICING</div>
+                <p>โปรแกรมฝึกทักษะสมองเพื่อส่งเสริมและคงไว้ซึ่งการคิดเชิงบริหาร</p>
+            </div>
+            <div class="auth-form">
+                <h2 class="form-title">LOGIN</h2>
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" placeholder="ยูเซอร์เนม" id="loginUsername" autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" placeholder="รหัสผ่าน" id="loginPassword">
+                </div>
+                <button class="btn-primary" onclick="handleLogin()">
+                    <i class="fas fa-sign-in-alt"></i>
+                    START
+                </button>
+                <div class="auth-link">
+                    ยังไม่มีบัญชี? <a href="#" onclick="showRegister()">สมัครสมาชิก</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Screen -->
+    <div id="registerScreen" class="screen">
+        <div class="auth-container">
+            <div class="logo-section">
+                <i class="fas fa-brain brain-icon"></i>
+                <h1>EF BUDDY</h1>
+                <div class="subtitle">EXECUTIVE FUNCTION PRACTICING</div>
+                <p>สร้างบัญชีใหม่เพื่อเริ่มต้นการฝึกทักษะสมอง</p>
+            </div>
+            <div class="auth-form">
+                <h2 class="form-title">REGISTER</h2>
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" placeholder="ยูเซอร์เนม" id="registerUsername">
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" placeholder="รหัสผ่าน" id="registerPassword">
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-venus-mars"></i>
+                    <select id="registerGender">
+                        <option value="">เลือกเพศ</option>
+                        <option value="ชาย">ชาย</option>
+                        <option value="หญิง">หญิง</option>
+                        <option value="อื่นๆ">อื่นๆ</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-birthday-cake"></i>
+                    <input type="number" placeholder="อายุ" id="registerAge" min="1" max="120">
+                </div>
+                <button class="btn-primary" onclick="handleRegister()">
+                    <i class="fas fa-user-plus"></i>
+                    CREATE
+                </button>
+                <div class="auth-link">
+                    มีบัญชีแล้ว? <a href="#" onclick="showLogin()">เข้าสู่ระบบ</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pet Selection Screen -->
+    <div id="petSelectionScreen" class="screen">
+        <div class="pet-selection-container">
+            <div class="pet-selection-title">
+                <h2>เลือกสัตว์เลี้ยงของคุณ</h2>
+                <p style="color: #f8fafc; margin-bottom: 2rem;">เลือกสัตว์เลี้ยงที่คุณต้องการดูแล
+                    (เลือกแล้วเปลี่ยนไม่ได้)</p>
+            </div>
+            <div class="pet-options">
+                <div class="pet-option" data-pet-id="1">
+                    <div class="pet-option-avatar">🐱</div>
+                    <div class="pet-option-name">BUDDY</div>
+                    <div class="pet-option-desc">แมวน้อยที่ชอบเล่นและฉลาด</div>
+                </div>
+                <div class="pet-option" data-pet-id="2">
+                    <div class="pet-option-avatar">🐶</div>
+                    <div class="pet-option-name">SPARK</div>
+                    <div class="pet-option-desc">สุนัขที่ซื่อสัตย์และเป็นมิตร</div>
+                </div>
+                <div class="pet-option" data-pet-id="3">
+                    <div class="pet-option-avatar">🐰</div>
+                    <div class="pet-option-name">FLUFF</div>
+                    <div class="pet-option-desc">กระต่ายที่น่ารักและกระฉับกระเฉง</div>
+                </div>
+            </div>
+            <button class="btn-primary" id="confirmPetBtn" onclick="confirmPetSelection()"
+                style="display: none; max-width: 300px;">
+                <i class="fas fa-check"></i>
+                ยืนยันการเลือก
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="screen">
+        <header class="top-bar">
+            <div class="user-info" onclick="window.location.href='dashboard.html'" style="cursor:pointer;">
+                <div class="avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="user-details">
+                    <span class="username">สวัสดี, ผู้ใช้</span>
+                    <span class="user-age">อายุ 16 ปี</span>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="points-display">
+                    <i class="fas fa-coins"></i>
+                    <span id="userPoints">500</span> PTS
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    EXIT
+                </button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Pet Section -->
+            <div class="pet-section">
+                <h2
+                    style="color: #1e3a8a; font-family: 'Press Start 2P', cursive; font-size: 1rem; margin-bottom: 1.5rem; text-align: center;">
+                    <i class="fas fa-paw"></i> MY PET BUDDY
+                </h2>
+                <div class="pet-container">
+                    <div class="pet-display">
+                        <div class="pet-avatar-container">
+                            <div class="pet-avatar" id="petAvatar">🐱</div>
+                            <div class="pet-outfit" id="petOutfitEmoji" style="display: none;"></div>
+                        </div>
+                        <div class="pet-info">
+                            <h3 id="petName">BUDDY</h3>
+                            <div class="pet-stats">
+                                <div class="pet-stat">
+                                    <i class="fas fa-heart"></i> HP: <span id="petHp">100</span>
+                                </div>
+                                <div class="pet-stat">
+                                    <i class="fas fa-star"></i> LV: <span id="petLevel">1</span>
+                                </div>
+                                <div class="pet-stat">
+                                    <i class="fas fa-smile"></i> MOOD: <span id="petMood">😊</span>
+                                </div>
+                                <div class="pet-stat">
+                                    <i class="fas fa-drumstick-bite"></i> FOOD: <span id="petFood">80</span>
+                                </div>
+                                
+                            </div>
+                            <div class="level-bar-container" style="margin-top: 1rem;">
+                                <div class="level-bar-bg"
+                                    style="width: 100%; height: 20px; background: #e2e8f0; border: 2px solid #1e3a8a;">
+                                    <div id="petLevelBar"
+                                        style="height: 100%; background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%); width: 10%; transition: width 0.3s ease;">
+                                    </div>
+                                </div>
+                                <small style="color: #64748b; margin-top: 0.5rem; display: block;">Level
+                                    Progress</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pet-actions">
+                        <button class="pet-btn" onclick="feedPet()">
+                            <i class="fas fa-apple-alt"></i> FEED (50 PTS)
+                        </button>
+                        <button class="pet-btn" onclick="upgradePet()">
+                            <i class="fas fa-arrow-up"></i> UPGRADE (200 PTS)
+                        </button>
+                        <button class="pet-btn" onclick="showShop()">
+                            <i class="fas fa-shopping-cart"></i> SHOP
+                        </button>
+                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shop Section -->
+            <div class="shop-section" id="shopSection" style="display: none;">
+                <h2><i class="fas fa-store"></i> PET SHOP</h2>
+                <div class="shop-items">
+                    <div class="shop-item">
+                        <div class="shop-item-icon">🍎</div>
+                        <div class="shop-item-name">Apple</div>
+                        <div class="shop-item-price">50 PTS</div>
+                        <button class="buy-btn" onclick="buyItem('food', 50, 20)">BUY</button>
+                    </div>
+                    <div class="shop-item">
+                        <div class="shop-item-icon">🥩</div>
+                        <div class="shop-item-name">Premium Food</div>
+                        <div class="shop-item-price">100 PTS</div>
+                        <button class="buy-btn" onclick="buyItem('food', 100, 50)">BUY</button>
+                    </div>
+
+                    <div class="shop-item">
+                        <div class="shop-item-icon">🍓</div>
+                        <div class="shop-item-name">Strawberry</div>
+                        <div class="shop-item-price">50 PTS</div>
+                        <button class="buy-btn" onclick="buyItem('food', 50, 20)">BUY</button>
+                    </div>
+                    <div class="shop-item">
+                        <div class="shop-item-icon">🥕</div>
+                        <div class="shop-item-name">Carret</div>
+                        <div class="shop-item-price">100 PTS</div>
+                        <button class="buy-btn" onclick="buyItem('food', 100, 50)">BUY</button>
+                    </div>
+                    <div class="shop-item">
+                        <div class="shop-item-icon">💊</div>
+                        <div class="shop-item-name">Medicine</div>
+                        <div class="shop-item-price">250 PTS</div>
+                        <button class="buy-btn" onclick="buyItem('food', 250, 120)">BUY</button>
+                    </div>
+                    <!-- <div class="shop-item">
+                        <div class="shop-item-icon">👕</div>
+                        <div class="shop-item-name">Cool Shirt</div>
+                        <div class="shop-item-price">150 PTS</div>
+                        <button class="buy-btn" onclick="buyItem('outfit', 150, '👕')">BUY</button>
+                    </div>
+                    <div class="shop-item">
+                        <div class="shop-item-icon">🎩</div>
+                        <div class="shop-item-name">Magic Hat</div>
+                        <div class="shop-item-price">200 PTS</div>
+                        <button class="buy-btn" onclick="buyItem('outfit', 200, '🎩')">BUY</button>
+                    </div>
+                    <div class="shop-item">
+                        <div class="shop-item-icon">👔</div>
+                        <div class="shop-item-name">Formal Suit</div>
+                        <div class="shop-item-price">250 PTS</div>
+                        <button class="buy-btn" onclick="buyItem('outfit', 250, '👔')">BUY</button>
+                    </div> -->
+                </div>
+                <div style="text-align: center; margin-top: 1rem;">
+                    <button class="pet-btn" onclick="hideShop()">
+                        <i class="fas fa-times"></i> CLOSE
+                    </button>
+                </div>
+            </div>
+
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <h2>WELCOME TO EF BUDDY!</h2>
+                <p>เริ่มต้นการฝึกทักษะ Executive Function เพื่อพัฒนาความสามารถทางสมองของคุณ และดูแลสัตว์เลี้ยงของคุณ!
+                </p>
+            </div>
+
+            <!-- EF Games Section (เชื่อมต่อกับเกม Clickez จาก Netlify) -->
+            <div class="games-section">
+                <h2><i class="fas fa-gamepad"></i> EF GAMES</h2>
+                <div class="ef-games-grid">
+                    <div class="ef-game-card">
+                        <div class="ef-game-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="ef-game-info">
+                            <div class="ef-game-title">Time Crunch Café</div>
+                            <div class="ef-game-description">ฝึกทักษะการจัดการเวลาและการบริหารงาน
+                                ในบทบาทของเจ้าของร้านกาแฟ</div>
+                        </div>
+                        <button class="play-btn" onclick="startEFGame('game_1');addHistory(1)"
+                            onclick-x="startEFGame('time-crunch-cafe')">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+
+                    <div class="ef-game-card">
+                        <div class="ef-game-icon">
+                            <i class="fas fa-mouse-pointer"></i>
+                        </div>
+                        <div class="ef-game-info">
+                            <div class="ef-game-title">Clickez</div>
+                            <div class="ef-game-description">ฝึกความจำขณะทำงาน ผ่านการจำและคลิกลำดับที่ถูกต้อง</div>
+                        </div>
+                        <button class="play-btn" onclick="startEFGame('game_2');addHistory(2)"
+                            onclick-x="startEFGame('clickez')">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+
+                    <div class="ef-game-card">
+                        <div class="ef-game-icon">
+                            <i class="fas fa-puzzle-piece"></i>
+                        </div>
+                        <div class="ef-game-info">
+                            <div class="ef-game-title">Decision Making Game</div>
+                            <div class="ef-game-description">ฝึกการแก้ปัญหาและการตัดสินใจ ผ่านสถานการณ์จำลองต่างๆ</div>
+                        </div>
+                        <button class="play-btn" onclick="startEFGame('game_3');addHistory(3)"
+                            onclick-x="startEFGame('solvies')">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Modal (สำหรับเปิดเกม Clickez จาก Netlify) -->
+    <div id="gameModal" class="game-modal">
+        <div class="game-modal-content">
+            <div class="game-modal-header">
+                <div class="game-modal-title" id="gameModalTitle">เกม EF</div>
+                <button class="close-game-btn" onclick="closeGame()">
+                    <i class="fas fa-times"></i> ปิดเกม
+                </button>
+            </div>
+            <div class="game-iframe-container">
+                <div class="loading-game" id="gameLoading">
+                    <div class="loading-spinner"></div>
+                    กำลังโหลดเกม...
+                </div>
+                <iframe id="gameIframe" class="game-iframe" style="display: none;"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUser = JSON.parse(localStorage.getItem('efBuddyCurrentUser')) || null;
+        let userPoints = parseInt(localStorage.getItem('efBuddyPoints')) || 0;
+        let selectedPetId = null;
+        let petData = JSON.parse(localStorage.getItem('efBuddyPet')) || null;
+        let currentGameWindow = null;
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('App initialized');
+            console.log('Current user:', currentUser);
+            console.log('Pet ', petData);
+
+            if (currentUser && petData) {
+                showDashboard();
+            } else if (currentUser && !petData) {
+                showPetSelection();
+            } else {
+                showLogin();
+            }
+
+            // Listen for messages from game windows
+            window.addEventListener('message', handleGameMessage);
+        });
+
+        // Screen navigation
+        function showLogin() {
+            hideAllScreens();
+            document.getElementById('loginScreen').classList.add('active');
+        }
+
+        function showRegister() {
+            hideAllScreens();
+            document.getElementById('registerScreen').classList.add('active');
+        }
+
+        function showPetSelection() {
+            hideAllScreens();
+            document.getElementById('petSelectionScreen').classList.add('active');
+
+            // Add click handlers to pet options
+            document.querySelectorAll('.pet-option').forEach(option => {
+                option.addEventListener('click', function () {
+                    selectInitialPet(parseInt(this.dataset.petId));
+                });
+            });
+        }
+
+        function showDashboard() {
+            hideAllScreens();
+            document.getElementById('dashboard').classList.add('active');
+            updateUserInfo();
+            updatePetDisplay();
+            updatePointsDisplay();
+        }
+
+        function hideAllScreens() {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+        }
+
+        // Pet selection functions
+        function selectInitialPet(petId) {
+            selectedPetId = petId;
+
+            // Remove previous selection
+            document.querySelectorAll('.pet-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+
+            // Add selection to clicked option
+            document.querySelector(`[data-pet-id="${petId}"]`).classList.add('selected');
+
+            // Show confirm button
+            document.getElementById('confirmPetBtn').style.display = 'block';
+        }
+
+        function confirmPetSelection() {
+            if (!selectedPetId) {
+                alert('กรุณาเลือกสัตว์เลี้ยงก่อน');
+                return;
+            }
+
+            const pets = [
+                { id: 1, name: 'BUDDY', avatar: '🐱' },
+                { id: 2, name: 'SPARK', avatar: '🐶' },
+                { id: 3, name: 'FLUFF', avatar: '🐰' }
+            ];
+
+            const selectedPet = pets.find(p => p.id === selectedPetId);
+
+            petData = {
+                id: selectedPet.id,
+                name: selectedPet.name,
+                avatar: selectedPet.avatar,
+                level: 1,
+                hp: 100,
+                food: 80,
+                mood: '😊',
+                outfits: [],
+                currentOutfit: null,
+                currentOutfitEmoji: null
+            };
+
+            localStorage.setItem('efBuddyPet', JSON.stringify(petData));
+            update_efBuddyPet(JSON.stringify(petData))
+            alert(`เลือก ${selectedPet.name} เป็นสัตว์เลี้ยงแล้ว! 🎉`);
+            showDashboard();
+        }
+        function update_efBuddyPet(obj) {
+            const url = url_addPoint;
+            const data = new URLSearchParams();
+            data.append('username', currentUser.username);
+            data.append('efBuddyPet', obj);
+            fetch(url, {
+                method: 'POST',
+                body: data,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                }
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        console.log('update_efBuddyPet ');
+                    } else {
+                        console.error('ล้มเหลว:', result.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('เกิดข้อผิดพลาด:', error);
+                });
+
+        }
+
+        if (typeof currentHistory === 'undefined') {
+            let currentHistory = JSON.parse(localStorage.getItem('historyData')) || [];
+        }
+
+
+        function getCurrentDateTime() {
+            const now = new Date();
+            // now.setHours(now.getHours() + 7); // ปรับเป็นเวลาไทย (UTC+7)
+            now.setHours(now.getHours());
+            const pad = (n) => n.toString().padStart(2, '0');
+            return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ` +
+                `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+        }
+
+        function addHistory(game) {
+            const newObj = {
+                date: getCurrentDateTime(),
+                playgame: game
+            };
+
+            const exists = currentHistory.some(item => item.date === newObj.date && item.playgame === newObj.playgame);
+
+            if (!exists) {
+                const maxSeq = currentHistory.length > 0
+                    ? Math.max(...currentHistory.map(item => item.seq || 0))
+                    : 0;
+                newObj.seq = maxSeq + 1;
+                currentHistory.push(newObj);
+            }
+            console.log('historyData:', currentHistory);
+            localStorage.setItem('historyData', JSON.stringify(currentHistory));
+            update_History(JSON.stringify(currentHistory));
+        }
+
+        function update_History(obj) {
+            const url = url_addPoint;
+            const data = new URLSearchParams();
+            data.append('username', currentUser.username);
+            data.append('historyData', obj);
+            fetch(url, {
+                method: 'POST',
+                body: data,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                }
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        console.log('historyData Success');
+                    } else {
+                        console.error('ล้มเหลว:', result.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('เกิดข้อผิดพลาด:', error);
+                });
+
+        }
+
+        // ----------- แก้ไขระบบ Login / Register ใหม่ -----------
+        // ฟังก์ชันสมัครสมาชิก
+        // function handleRegister() {
+        //     const username = document.getElementById('registerUsername').value.trim();
+        //     const password = document.getElementById('registerPassword').value;
+        //     const gender = document.getElementById('registerGender').value;
+        //     const age = document.getElementById('registerAge').value;
+
+        //     if (!username || !password || !gender || !age) {
+        //         alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+        //         return;
+        //     }
+
+        //     // เช็คซ้ำ
+        //     if (localStorage.getItem('efBuddyUser_' + username)) {
+        //         alert('ยูเซอร์เนมนี้ถูกใช้ไปแล้ว');
+        //         return;
+        //     }
+
+        //     const user = {
+        //         username: username,
+        //         password: password,
+        //         gender: gender,
+        //         age: parseInt(age),
+        //         registeredAt: new Date().toISOString()
+        //     };
+
+        //     localStorage.setItem('efBuddyUser_' + username, JSON.stringify(user));
+        //     alert('สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ');
+        //     showLogin();
+        // }
+
+
+        async function handleRegister() {
+            document.getElementById('loadingModal').style.display = 'flex'; // แสดง
+            const username = document.getElementById('registerUsername').value.trim();
+            const password = String(document.getElementById('registerPassword').value);
+            const gender = document.getElementById('registerGender').value;
+            const age = document.getElementById('registerAge').value;
+
+            if (!username || !password || !gender || !age) {
+                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return;
+            }
+
+            const user = {
+                username,
+                password,
+                gender,
+                age: parseInt(age)
+            };
+
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(user)
+                });
+                document.getElementById('loadingModal').style.display = 'none';
+                alert('✅ สมัครสมาชิกสำเร็จ! ข้อมูลถูกบันทึกแล้ว');
+            } catch (error) {
+                alert('❌ เกิดข้อผิดพลาด: ' + error.message);
+            }
+        }
+
+        // ฟังก์ชันล็อกอิน
+        // function handleLogin() {
+        //     const username = document.getElementById('loginUsername').value.trim();
+        //     const password = document.getElementById('loginPassword').value;
+
+        //     const userData = localStorage.getItem('efBuddyUser_' + username);
+        //     if (!userData) {
+        //         alert('ไม่พบผู้ใช้นี้');
+        //         return;
+        //     }
+        //     const user = JSON.parse(userData);
+        //     if (user.password !== password) {
+        //         alert('รหัสผ่านไม่ถูกต้อง');
+        //         return;
+        //     }
+
+        //     localStorage.setItem('efBuddyCurrentUser', JSON.stringify(user));
+        //     currentUser = user;
+        //     // ดำเนินการต่อ เช่น showDashboard()
+        //     if (petData) {
+        //         showDashboard();
+        //     } else {
+        //         showPetSelection();
+        //     }
+        // }
+
+        async function handleLogin() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!username || !password) {
+                alert('กรุณากรอก username และ password');
+                return;
+            }
+            console.log('username : ', username)
+            console.log('password : ', password)
+
+            // const scriptUrl = 'https://script.google.com/macros/s/AKfycby2RY0O_FSCWKDzg58iMWq6nbMruIQLRoepDICXZoBc4lG-zwD9v2mZ9iJF_TT-qtFPiA/exec';
+
+            document.getElementById('loadingModal').style.display = 'flex'; // แสดง
+
+            try {
+                const response = await fetch(scriptUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ username, password })
+                });
+                const result = await response.json();
+                document.getElementById('loadingModal').style.display = 'none'; // ซ่อน
+
+
+                if (result.success) {
+                    // alert(result.message);
+                    localStorage.setItem('efBuddyCurrentUser', JSON.stringify(result.user));
+                    // localStorage.setItem('efBuddyPet', JSON.stringify(JSON.parse(result.user.efBuddyPet)));
+
+                    const userGet = {
+                        username: result.user.username,
+                        password: result.user.password,
+                        gender: result.user.gender,
+                        age: parseInt(result.user.age),
+                        point: result.user.point,
+                        score_1: result.user.score_1,
+                        score_2: result.user.score_2,
+                        score_3: result.user.score_3,
+                        best_score_1: result.user.best_score_1,
+                        best_score_2: result.user.best_score_2,
+                        best_score_3: result.user.best_score_3,
+                        registeredAt: new Date().toISOString()
+                    };
+
+                    localStorage.setItem('efBuddyUser_' + username, JSON.stringify(userGet));
+                    localStorage.setItem('blinkBestScore', parseInt(userGet.best_score_2));
+                    localStorage.setItem('efBuddyPoints', parseInt(userGet.point));
+
+
+
+                    const userData = localStorage.getItem('efBuddyUser_' + result.user.username);
+                    const user = JSON.parse(userData);
+                    currentUser = user;
+
+                    try {
+                        let petDataX = result.user.efBuddyPet;
+
+                        if (typeof petDataX === 'string') {
+                            const parsed = JSON.parse(petDataX);
+                            localStorage.setItem('efBuddyPet', JSON.stringify(parsed));
+                            console.log('A : ', JSON.stringify(parsed))
+                            location.reload()
+
+                        } else {
+                            localStorage.setItem('efBuddyPet', JSON.stringify(petDataX));
+                            console.log('B : ', JSON.stringify(petDataX))
+                        }
+                    } catch (e) {
+                        console.log('เลือกสัตว์เลี้ยง')
+                        showPetSelection();
+                    }
+
+                    let history = result.user.historyData;
+
+                    try {
+                        if (typeof history === 'string' && history.trim() === '') {
+                            history = [];
+                        } else if (typeof history === 'string') {
+                            history = JSON.parse(history);
+                        }
+
+                        localStorage.setItem('historyData', JSON.stringify(history));
+                    } catch (e) {
+                        console.error('Invalid historyData:', history);
+                        localStorage.setItem('historyData', JSON.stringify([]));
+                    }
+
+
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                alert('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
+                document.getElementById('loadingModal').style.display = 'none'; // ซ่อนตอนเกิด error
+                console.error(error);
+            }
+        }
+
+
+
+        // -------------------------------------------------------
+
+        // Update functions
+        function updateUserInfo() {
+            if (currentUser) {
+                document.querySelector('.username').textContent = `สวัสดี, ${currentUser.username}`;
+                document.querySelector('.user-age').textContent = `อายุ ${currentUser.age} ปี`;
+            }
+        }
+        function updatePetDisplay() {
+            if (!petData) return;
+
+            console.log('Updating pet display:', petData);
+
+            document.getElementById('petAvatar').textContent = petData.avatar;
+            document.getElementById('petName').textContent = petData.name;
+            document.getElementById('petLevel').textContent = petData.level;
+            document.getElementById('petHp').textContent = petData.hp;
+            document.getElementById('petFood').textContent = petData.food;
+            document.getElementById('petMood').textContent = petData.mood;
+
+            // แสดงชุดที่ใส่
+            const outfitDisplay = document.getElementById('petOutfitDisplay');
+            const outfitEmoji = document.getElementById('petOutfitEmoji');
+
+            if (petData.currentOutfit && petData.currentOutfitEmoji) {
+                outfitDisplay.textContent = petData.currentOutfit;
+                outfitEmoji.textContent = petData.currentOutfitEmoji;
+                outfitEmoji.style.display = 'block';
+            } else {
+                outfitDisplay.textContent = 'ยังไม่ได้ใส่ชุด';
+                outfitEmoji.style.display = 'none';
+            }
+
+            // อัปเดตหลอดเลเวล
+            const levelBar = document.getElementById('petLevelBar');
+            if (levelBar) {
+                const maxLevel = 10;
+                const progressPercent = (petData.level / maxLevel) * 100;
+                levelBar.style.width = progressPercent + '%';
+            }
+
+            // อัปเดต mood
+            if (petData.food > 70) {
+                petData.mood = '😊';
+            } else if (petData.food > 30) {
+                petData.mood = '😐';
+            } else {
+                petData.mood = '😢';
+            }
+            document.getElementById('petMood').textContent = petData.mood;
+            localStorage.setItem('efBuddyPet', JSON.stringify(petData));
+        }
+
+        function updatePointsDisplay() { // คะแนน
+
+            document.getElementById('userPoints').textContent = currentUser.point;
+            localStorage.setItem('efBuddyPoints', currentUser.point.toString());
+            // document.getElementById('userPoints').textContent = userPoints;
+            // localStorage.setItem('efBuddyPoints', userPoints.toString());
+        }
+
+        function earnPoints(amount) {
+            userPoints += amount;
+            updatePointsDisplay();
+
+            const pointsEarned = document.createElement('div');
+            pointsEarned.className = 'points-earned';
+            pointsEarned.innerHTML = `+${amount} PTS!`;
+            document.body.appendChild(pointsEarned);
+
+            setTimeout(() => {
+                if (document.body.contains(pointsEarned)) {
+                    document.body.removeChild(pointsEarned);
+                }
+            }, 2000);
+        }
+
+        // Pet functions
+        function feedPet() {
+            console.log('Feed pet clicked, current points:', userPoints);
+            if (userPoints >= 50) {
+                userPoints -= 50;
+                petData.food = Math.min(100, petData.food + 20);
+                petData.hp = Math.min(100, petData.hp + 5);
+                // custom
+                currentUser.point = parseInt(userPoints)
+
+                updatePetDisplay();
+                updatePointsDisplay();
+                alert('🍎 ให้อาหารสัตว์เลี้ยงแล้ว! Food +20, HP +5');
+
+                // custom
+                localStorage.setItem('efBuddyPet', JSON.stringify(petData));
+                update_efBuddyPet(JSON.stringify(petData))
+                updatePoint(userPoints)
+
+            } else {
+                alert('❌ พอยท์ไม่เพียงพอ! ต้องการ 50 พอยท์');
+            }
+        }
+
+        function upgradePet() {
+            console.log('Upgrade pet clicked, current points:', userPoints);
+            if (userPoints >= 200) {
+                userPoints -= 200;
+                petData.level = Math.min(10, petData.level + 1);
+                petData.hp = 100;
+                petData.food = 100;
+
+                // custom
+                currentUser.point = parseInt(userPoints)
+                
+                updatePetDisplay();
+                updatePointsDisplay();
+                alert(`🎉 อัปเกรดสัตว์เลี้ยงสำเร็จ! ตอนนี้เป็น Level ${petData.level}`);
+
+                // custom
+                localStorage.setItem('efBuddyPet', JSON.stringify(petData));
+                update_efBuddyPet(JSON.stringify(petData))
+                updatePoint(userPoints)
+            } else {
+                alert('❌ พอยท์ไม่เพียงพอ! ต้องการ 200 พอยท์');
+            }
+        }
+
+        function showShop() {
+            console.log('Show shop clicked');
+            document.getElementById('shopSection').style.display = 'block';
+        }
+
+        function hideShop() {
+            console.log('Hide shop clicked');
+            document.getElementById('shopSection').style.display = 'none';
+        }
+
+        function buyItem(type, cost, benefit) {
+            console.log('Buy item clicked:', type, cost, benefit, 'current points:', userPoints);
+            if (userPoints >= cost) {
+                userPoints -= cost;
+
+                currentUser.point = parseInt(userPoints)
+
+                if (type === 'food') {
+                    // เพิ่มค่าความอิ่ม (food) ให้สัตว์เลี้ยง โดยไม่ให้เกิน 100
+                    petData.food = Math.min(100, petData.food + benefit);
+                    alert(`ซื้อสำเร็จ! Food +${benefit}`);
+                } else if (type === 'outfit') {
+                    // if (!petData.outfits) petData.outfits = [];
+                    // // Check if already owned
+                    // if (petData.outfits.includes(benefit)) {
+                    //     alert('คุณมีชุดนี้อยู่แล้ว!');
+                    //     userPoints += cost; // คืนเงิน
+                    // } else {
+                    //     petData.outfits.push(benefit);
+                    //     alert('🎉 ซื้อชุดสำเร็จ! ได้รับชุดใหม่');
+                    // }
+                }
+                updatePetDisplay();
+                updatePointsDisplay();
+                localStorage.setItem('efBuddyPet', JSON.stringify(petData));
+                update_efBuddyPet(JSON.stringify(petData))
+                updatePoint(userPoints)
+
+            } else {
+                alert('❌ พอยท์ไม่เพียงพอ!');
+            }
+        }
+
+        function showOutfits() {
+            if (!petData.outfits || petData.outfits.length === 0) {
+                alert('คุณยังไม่มีชุด! ไปซื้อที่ SHOP ก่อนนะ');
+                return;
+            }
+
+            // Simple prompt for demonstration; replace with a nicer UI as needed
+            let outfitList = petData.outfits.map((o, i) => `${i + 1}. ${o}`).join('\n');
+            let choice = prompt(`เลือกชุดที่ต้องการใส่:\n${outfitList}\nกรอกหมายเลขชุดที่ต้องการ:`);
+            let idx = parseInt(choice) - 1;
+
+            if (!isNaN(idx) && petData.outfits[idx]) {
+                const outfitNames = {
+                    '👕': 'Cool Shirt',
+                    '🎩': 'Magic Hat',
+                    '👔': 'Formal Suit'
+                };
+
+                petData.currentOutfit = outfitNames[petData.outfits[idx]] || 'Unknown Outfit';
+                petData.currentOutfitEmoji = petData.outfits[idx];
+                updatePetDisplay();
+                localStorage.setItem('efBuddyPet', JSON.stringify(petData));
+                alert('เปลี่ยนชุดสำเร็จ!');
+            } else {
+                alert('กรุณาเลือกหมายเลขที่ถูกต้อง');
+            }
+        }
+
+        function logout() {
+            localStorage.clear();
+            // localStorage.removeItem('efBuddyCurrentUser');
+            currentUser = null;
+            showLogin();
+        }
+
+        // ----------- External Game Loading System (เชื่อมต่อกับเกม Clickez จาก Netlify) -----------
+
+        // Game configuration (เชื่อมต่อกับลิงก์ Netlify ของคุณ)
+        const gameConfig = {
+            'game_1': {
+                title: 'Time Crunch Café',
+                url: 'games/game_1.html',
+                width: 800,
+                height: 600,
+                points: {
+                    participation: 20, // รับคะแนน
+                    bronze: 50,
+                    silver: 100,
+                    gold: 150
+                }
+            },
+            'game_2': {
+                title: 'Clickez',
+                url: 'games/game_2.html',
+                width: 800,
+                height: 600,
+                points: {
+                    participation: 20, // รับคะแนน
+                    bronze: 50,
+                    silver: 100,
+                    gold: 150
+                }
+            },
+            'game_3': {
+                title: 'Decision Making Game',
+                url: 'games/game_3.html',
+                width: 800,
+                height: 600,
+                points: {
+                    participation: 20, // รับคะแนน
+                    bronze: 50,
+                    silver: 100,
+                    gold: 150
+                }
+            }
+        };
+        // const gameConfig = {
+        //     'clickez': {
+        //         title: 'Clickez - Working Memory Game',
+        //         url: 'https://jovial-praline-51799d.netlify.app', // ลิงก์ Netlify ใหม่
+        //         width: 800,
+        //         height: 600,
+        //         points: {
+        //             participation: 20, // รับคะแนน
+        //             bronze: 50,
+        //             silver: 100,
+        //             gold: 150
+        //         }
+        //     },
+        //     'time-crunch-cafe': {
+        //         title: 'Time Crunch Café - Management Game',
+        //         url: 'games/time-crunch-cafe.html',
+        //         width: 900,
+        //         height: 700,
+        //         points: {
+        //             participation: 20, // รับคะแนน
+        //             bronze: 60,
+        //             silver: 120,
+        //             gold: 180
+        //         }
+        //     },
+        //     'solvies': {
+        //         title: 'Solvies - Problem Solving Game',
+        //         url: 'games/solvies.html',
+        //         width: 750,
+        //         height: 550,
+        //         points: {
+        //             participation: 20, // รับคะแนน
+        //             bronze: 40,
+        //             silver: 80,
+        //             gold: 120
+        //         }
+        //     }
+        // };
+
+        // Main EF Game launcher
+        function startEFGame(gameType) {
+            console.log('Starting EF Game:', gameType);
+
+            const config = gameConfig[gameType];
+            if (!config) {
+                alert('เกมนี้ยังไม่พร้อมใช้งาน');
+                return;
+            }
+
+            // สำหรับเกม Clickez ให้เปิดโดยตรง
+            // if (gameType === 'game_1') {
+            //     openGameModal(gameType, config);
+            // } else {
+            //     // สำหรับเกมอื่นๆ ให้แสดง placeholder
+            //     // showGamePlaceholder(gameType, config);
+            // }
+
+            earnPoints(pointEndGame)
+            setTimeout(function () {
+                openGameModal(gameType, config);
+                addPoint()
+            }, 1500);
+
+
+            // showGamePlaceholder(gameType, config);
+        }
+
+        // Open game in modal
+        function openGameModal(gameType, config) {
+            const modal = document.getElementById('gameModal');
+            const title = document.getElementById('gameModalTitle');
+            const iframe = document.getElementById('gameIframe');
+            const loading = document.getElementById('gameLoading');
+
+            // Set title
+            title.textContent = config.title;
+
+            // Show modal
+            modal.style.display = 'block';
+
+            // Show loading
+            loading.style.display = 'block';
+            iframe.style.display = 'none';
+
+            // Load game
+            iframe.src = config.url;
+
+            // Handle iframe load
+            iframe.onload = function () {
+                loading.style.display = 'none';
+                iframe.style.display = 'block';
+
+                // Send initial data to game
+                setTimeout(() => {
+                    try {
+                        iframe.contentWindow.postMessage({
+                            type: 'INIT_GAME',
+                            user: currentUser,
+                            pet: petData,
+                            points: userPoints
+                        }, '*');
+                    } catch (e) {
+                        console.log('Could not send init message to game:', e);
+                    }
+                }, 1000);
+            };
+
+            // Handle iframe error (fallback to new window)
+            iframe.onerror = function () {
+                console.log('iframe failed, opening in new window');
+                modal.style.display = 'none';
+                window.open(config.url, 'ClickezGame', `width=${config.width},height=${config.height}`);
+                earnPoints(config.points.participation);
+            };
+
+            // Store current game info
+            currentGameWindow = {
+                type: gameType,
+                config: config,
+                iframe: iframe
+            };
+        }
+
+        // Show placeholder for games that don't exist yet
+        function showGamePlaceholder(gameType, config) {
+            const gameNames = {
+                'clickez': 'Clickez',
+                'time-crunch-cafe': 'Time Crunch Café',
+                'solvies': 'Solvies'
+            };
+
+            alert(`🎮 เกม "${gameNames[gameType]}" กำลังเตรียมตัว!\n\nเกมนี้จะเปิดให้เล่นเร็วๆ นี้...\n\nขณะนี้คุณได้รับ ${config.points.participation} พอยท์สำหรับการทดลองเล่น!`);
+
+            // Give participation points
+            earnPoints(config.points.participation);
+
+            console.log(`${gameType} game placeholder shown`);
+        }
+
+        // Close game modal
+        function closeGame() {
+            const modal = document.getElementById('gameModal');
+            const iframe = document.getElementById('gameIframe');
+
+            // Hide modal
+            modal.style.display = 'none';
+
+            // Clear iframe
+            iframe.src = 'about:blank';
+
+            // Clear current game
+            currentGameWindow = null;
+
+            console.log('Game closed');
+        }
+
+        // Handle messages from games
+        function handleGameMessage(event) {
+            // Security check - only accept messages from our domain
+            // In production, replace with your actual domain
+            // if (event.origin !== 'https://yourdomain.com') return;
+
+            const data = event.data;
+
+            if (!data || !data.type) return;
+
+            console.log('Received message from game:', data);
+
+            switch (data.type) {
+                case 'GAME_COMPLETED':
+                    handleGameCompleted(data);
+                    break;
+
+                case 'GAME_SCORE':
+                    handleGameScore(data);
+                    break;
+
+                case 'GAME_EXIT':
+                    closeGame();
+                    break;
+
+                case 'REQUEST_USER_DATA':
+                    sendUserDataToGame();
+                    break;
+
+                default:
+                    console.log('Unknown message type:', data.type);
+            }
+        }
+
+        // Handle game completion
+        function handleGameCompleted(data) {
+            const gameType = data.gameType || (currentGameWindow ? currentGameWindow.type : 'unknown');
+            const score = data.score || 0;
+            const performance = data.performance || 'participation';
+
+            console.log(`Game ${gameType} completed with score ${score} and performance ${performance}`);
+
+            // Calculate points based on performance
+            let pointsEarned = 0;
+            if (currentGameWindow && currentGameWindow.config) {
+                const config = currentGameWindow.config;
+                pointsEarned = config.points[performance] || config.points.participation;
+            } else {
+                pointsEarned = 25; // Default participation points
+            }
+
+            // Award points
+            earnPoints(pointsEarned);
+
+            // Show completion message
+            setTimeout(() => {
+                alert(`🎉 เกมเสร็จสิ้น!\n\nคะแนน: ${score}\nผลงาน: ${performance.toUpperCase()}\nได้รับ: ${pointsEarned} พอยท์`);
+                closeGame();
+            }, 1000);
+
+            // Update pet happiness based on performance
+            if (petData && performance !== 'participation') {
+                petData.food = Math.min(100, petData.food + 5);
+                petData.hp = Math.min(100, petData.hp + 3);
+                updatePetDisplay();
+            }
+        }
+
+        // Handle game score updates
+        function handleGameScore(data) {
+            const score = data.score || 0;
+            console.log(`Game score updated: ${score}`);
+
+            // You can update UI here if needed
+            // For example, show current score in the modal header
+        }
+
+        // Send user data to game
+        function sendUserDataToGame() {
+            if (currentGameWindow && currentGameWindow.iframe) {
+                try {
+                    currentGameWindow.iframe.contentWindow.postMessage({
+                        type: 'USER_DATA',
+                        user: currentUser,
+                        pet: petData,
+                        points: userPoints
+                    }, '*');
+                } catch (e) {
+                    console.log('Could not send user data to game:', e);
+                }
+            }
+        }
+
+        // Keyboard shortcuts for games
+        document.addEventListener('keydown', function (event) {
+            // ESC key to close game
+            if (event.key === 'Escape' && currentGameWindow) {
+                event.preventDefault();
+                closeGame();
+            }
+
+            // Alt + R = Reset game
+            if (event.altKey && event.key === 'r') {
+                event.preventDefault();
+                resetGame();
+            }
+
+            // Alt + P = Add debug points
+            if (event.altKey && event.key === 'p') {
+                event.preventDefault();
+                addDebugPoints();
+            }
+        });
+
+        // Additional utility functions
+        function resetGame() {
+            if (confirm('ต้องการรีเซ็ตเกมทั้งหมดหรือไม่? (ข้อมูลทั้งหมดจะหายไป)')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // Debug functions (for development)
+        function addDebugPoints() {
+            if (confirm('เพิ่ม 1000 พอยท์สำหรับทดสอบ?')) {
+                earnPoints(1000);
+            }
+        }
+
+        // Auto-save functionality
+        // setInterval(function () {
+        //     if (currentUser && petData) {
+        //         localStorage.setItem('efBuddyCurrentUser', JSON.stringify(currentUser));
+        //         localStorage.setItem('efBuddyPet', JSON.stringify(petData));
+        //         localStorage.setItem('efBuddyPoints', userPoints.toString());
+        //     }
+        // }, 30000); // Auto-save every 30 seconds
+
+        // Performance monitoring
+        console.log('EF Buddy loaded successfully!');
+        console.log('Current user:', currentUser);
+        console.log('Pet ', petData);
+        console.log('User points:', userPoints);
+        console.log('Game system ready!');
+        // console.log('Clickez game URL:', gameConfig.clickez.url);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Crunch Café</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../config.js"></script>
+    <script src="../function.js"></script>
+    <link href="../custom.css" rel="stylesheet">
+
+    <style>
+
+
+        .bg-amber-50 {
+             background: #6495ED !important;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .pulse-animation {
+            animation: pulse 1s infinite;
+        }
+
+        .shake-animation {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .progress-bar {
+            transition: width 0.1s linear;
+        }
+
+        .customer-card {
+            transition: all 0.3s ease;
+        }
+
+        .customer-card.urgent {
+            border-color: #ef4444;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+    </style>
+</head>
+
+<body class="bg-amber-50 min-h-screen">
+    <div id="loadingSave" style="display:none;">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <p>กำลังบันทึก...</p>
+        </div>
+    </div>
+    <!-- Game Container -->
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-4xl font-bold text-amber-800 mb-2">☕ Time Crunch Café</h1>
+            <p class="text-amber-700">จัดการร้านกาแฟให้มีประสิทธิภาพสูงสุด!</p>
+        </div>
+
+        <!-- Game Stats -->
+        <div class="bg-white rounded-full shadow-lg p-4 mb-6 max-w-4xl mx-auto">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                <div class="bg-red-50 rounded-full p-4 aspect-[4/3] flex flex-col justify-center">
+                    <div class="text-xl font-bold text-red-600" id="timeLeft">66</div>
+                    <div class="text-xs text-red-500 mt-1">วินาทีที่เหลือ</div>
+                </div>
+                <div class="bg-green-50 rounded-full p-4 aspect-[4/3] flex flex-col justify-center">
+                    <div class="text-xl font-bold text-green-600" id="score">0</div>
+                    <div class="text-xs text-green-500 mt-1">คะแนน</div>
+                </div>
+                <div class="bg-blue-50 rounded-full p-4 aspect-[4/3] flex flex-col justify-center">
+                    <div class="text-xl font-bold text-blue-600" id="coffeeStock">0</div>
+                    <div class="text-xs text-blue-500 mt-1">กาแฟพร้อมเสิร์ฟ</div>
+                </div>
+                <div class="bg-purple-50 rounded-full p-4 aspect-[4/3] flex flex-col justify-center">
+                    <div class="text-xl font-bold text-purple-600" id="customersServed">0</div>
+                    <div class="text-xs text-purple-500 mt-1">ลูกค้าที่เสร็จ</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button id="prepareBtn"
+                    class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105">
+                    <div class="text-lg">🔧 เตรียมของ</div>
+                    <div class="text-sm opacity-90">5 วินาที → +3 แก้ว</div>
+                </button>
+                <button id="serveBtn"
+                    class="bg-green-500 hover:bg-green-600 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105">
+                    <div class="text-lg">☕ เสิร์ฟกาแฟ</div>
+                    <div class="text-sm opacity-90">3 วินาที</div>
+                    <div class="text-xs opacity-75" id="serveCounter">เสิร์ฟได้: 0 ครั้ง</div>
+                </button>
+                <button id="cashierBtn"
+                    class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105">
+                    <div class="text-lg">💰 คิดเงิน</div>
+                    <div class="text-sm opacity-90">4 วินาที</div>
+                </button>
+            </div>
+            <div id="actionStatus" class="text-center mt-4 text-lg font-semibold text-amber-700"></div>
+        </div>
+
+        <!-- Customer Queue -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <h3 class="text-xl font-semibold text-amber-800 mb-4">🧑‍🤝‍🧑 คิวลูกค้า</h3>
+            <div id="customerQueue" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Customer cards will be added here -->
+            </div>
+            <div id="emptyQueue" class="text-center text-gray-500 py-8">
+                <div class="text-4xl mb-2">😴</div>
+                <div>ยังไม่มีลูกค้า รอสักครู่...</div>
+            </div>
+        </div>
+
+        <!-- Start/End Game -->
+        <div id="startScreen" class="bg-white rounded-xl shadow-lg p-8 text-center">
+            <div class="text-6xl mb-4">☕</div>
+            <h2 class="text-2xl font-bold text-amber-800 mb-4">พร้อมเปิดร้านกาแฟแล้วหรือยัง?</h2>
+            <p class="text-amber-700 mb-6">คุณมีเวลา 66 วินาที ในการให้บริการลูกค้าให้ได้มากที่สุด!</p>
+            <button id="startBtn"
+                class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-lg text-xl transition-all duration-200 transform hover:scale-105">
+                🚀 เริ่มเกม
+            </button>
+
+            <!-- Game Instructions -->
+            <div class="mt-8 bg-amber-50 border border-amber-200 rounded-lg p-6 text-left">
+                <h3 class="text-xl font-bold text-amber-800 mb-4 text-center">🕹️ วิธีการเล่นเกม Time Crunch Café</h3>
+
+                <div class="space-y-4 text-amber-800">
+                    <p class="text-sm leading-relaxed">
+                        <strong>🎯 เป้าหมาย:</strong> บริการลูกค้าให้ได้มากที่สุดใน 66 วินาที (2.5 นาที)
+                    </p>
+
+                    <div class="bg-white rounded-lg p-4">
+                        <h4 class="font-semibold mb-2">📋 ขั้นตอนการเล่น:</h4>
+                        <ol class="text-sm space-y-1 list-decimal list-inside">
+                            <li><strong>เตรียมของ</strong> (5 วินาที) → ได้วัตถุดิบ 3 แก้ว</li>
+                            <li><strong>เสิร์ฟกาแฟ</strong> (3 วินาที) → ลูกค้าพอใจ</li>
+                            <li><strong>คิดเงิน</strong> (4 วินาที) → ได้ 1 คะแนน</li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-white rounded-lg p-4">
+                        <h4 class="font-semibold mb-2">⏰ เวลาที่ลูกค้ารอได้:</h4>
+                        <ul class="text-sm space-y-1 list-disc list-inside">
+                            <li>รอกาแฟ: <strong>14 วินาที</strong></li>
+                            <li>รอคิดเงิน: <strong>17 วินาที</strong></li>
+                            <li>ลูกค้าใหม่มาทุก <strong>7 วินาที</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+                        <p class="text-sm text-red-700">
+                            <strong>⚠️ สำคัญ:</strong> ทำได้ทีละอย่าง! ลูกค้าที่รอนานเกินไปจะหายไป
+                        </p>
+                    </div>
+
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+                        <p class="text-sm text-green-700">
+                            <strong>💡 เคล็ดลับ:</strong> เตรียมกาแฟล่วงหน้า และดูลูกค้าที่เร่งด่วน (การ์ดสีแดงสั่น)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="endScreen" class="bg-white rounded-xl shadow-lg p-8 text-center hidden">
+            <div class="text-6xl mb-4" id="endEmoji">🎉</div>
+            <h2 class="text-2xl font-bold text-amber-800 mb-4">เกมจบแล้ว!</h2>
+            <div class="text-lg text-amber-700 mb-6">
+                <div>คะแนนรวม: <span class="font-bold text-2xl text-green-600" id="finalScore">0</span></div>
+                <div>ลูกค้าที่เสร็จ: <span class="font-bold" id="finalCustomersServed">0</span> คน</div>
+                <div>ลูกค้าที่หลุด: <span class="font-bold text-red-600" id="customersLost">0</span> คน</div>
+                <div style="margin-top: 20px;"><span class="font-bold " id="customersLostLevel"
+                        style="color: black;"></span></div>
+                <div>คำอธิบาย : <span class="font-bold " id="customersLostMsg" style="color: black;"></span></div>
+                <div>แนวพัฒนา : <span class="font-bold " id="customersLostMsg2" style="color: black;"></span></div>
+            </div>
+
+
+
+
+            <button id="restartBtn"
+                class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-lg text-xl transition-all duration-200 transform hover:scale-105">
+                🔄 เล่นอีกครั้ง
+            </button>
+        </div>
+    </div>
+
+    <script>
+        class TimeCrunchCafe {
+            constructor() {
+                this.gameTime = 66; // เวลาเกมส์
+                this.score = 0;
+                this.coffeeStock = 0;
+                this.customersServed = 0;
+                this.customersLost = 0;
+                this.customers = [];
+                this.nextCustomerId = 1;
+                this.gameRunning = false;
+                this.actionInProgress = false;
+                this.gameTimer = null;
+                this.customerSpawnTimer = null;
+
+                this.customerNames = [
+                    'คุณสมชาย', 'คุณสมหญิง', 'คุณนิรันดร์', 'คุณวิไล', 'คุณประยุทธ์',
+                    'คุณสุดา', 'คุณมานะ', 'คุณจิรา', 'คุณสมศักดิ์', 'คุณพิมพ์',
+                    'คุณธนา', 'คุณรัตนา', 'คุณวิชัย', 'คุณสุนีย์', 'คุณอนุชา'
+                ];
+
+                this.initializeElements();
+                this.bindEvents();
+            }
+
+            initializeElements() {
+                this.elements = {
+                    timeLeft: document.getElementById('timeLeft'),
+                    score: document.getElementById('score'),
+                    coffeeStock: document.getElementById('coffeeStock'),
+                    customersServed: document.getElementById('customersServed'),
+                    customerQueue: document.getElementById('customerQueue'),
+                    emptyQueue: document.getElementById('emptyQueue'),
+                    prepareBtn: document.getElementById('prepareBtn'),
+                    serveBtn: document.getElementById('serveBtn'),
+                    cashierBtn: document.getElementById('cashierBtn'),
+                    actionStatus: document.getElementById('actionStatus'),
+                    startScreen: document.getElementById('startScreen'),
+                    endScreen: document.getElementById('endScreen'),
+                    startBtn: document.getElementById('startBtn'),
+                    restartBtn: document.getElementById('restartBtn'),
+                    finalScore: document.getElementById('finalScore'),
+                    finalCustomersServed: document.getElementById('finalCustomersServed'),
+                    customersLost: document.getElementById('customersLost'),
+                    endEmoji: document.getElementById('endEmoji'),
+                    serveCounter: document.getElementById('serveCounter')
+                };
+            }
+
+            bindEvents() {
+                this.elements.startBtn.addEventListener('click', () => this.startGame());
+                this.elements.restartBtn.addEventListener('click', () => this.restartGame());
+                this.elements.prepareBtn.addEventListener('click', () => this.prepareAction());
+                this.elements.serveBtn.addEventListener('click', () => this.serveAction());
+                this.elements.cashierBtn.addEventListener('click', () => this.cashierAction());
+            }
+
+            startGame() {
+                this.gameRunning = true;
+                this.elements.startScreen.classList.add('hidden');
+                this.resetGame();
+                this.startTimers();
+                this.spawnCustomer(); // Spawn first customer immediately
+            }
+
+            resetGame() {
+                this.gameTime = 66;
+                this.score = 0;
+                this.coffeeStock = 0;
+                this.customersServed = 0;
+                this.customersLost = 0;
+                this.customers = [];
+                this.nextCustomerId = 1;
+                this.actionInProgress = false;
+                this.updateDisplay();
+                this.updateCustomerQueue();
+            }
+
+            startTimers() {
+                // Main game timer
+                this.gameTimer = setInterval(() => {
+                    this.gameTime--;
+                    this.updateDisplay();
+
+                    if (this.gameTime <= 0) {
+                        this.endGame();
+                    }
+                }, 1000);
+
+                // Customer spawn timer (every 7 seconds)
+                this.customerSpawnTimer = setInterval(() => {
+                    if (this.gameRunning) {
+                        this.spawnCustomer();
+                    }
+                }, 7000);
+
+                // Customer timer updates (every second)
+                this.customerUpdateTimer = setInterval(() => {
+                    this.updateCustomers();
+                }, 1000);
+            }
+
+            spawnCustomer() {
+                const name = this.customerNames[Math.floor(Math.random() * this.customerNames.length)];
+                const customer = {
+                    id: this.nextCustomerId++,
+                    name: name,
+                    status: 'waiting_coffee', // waiting_coffee, waiting_payment, satisfied
+                    timeLeft: 14, // 14 seconds to wait for coffee
+                    maxTime: 14
+                };
+
+                this.customers.push(customer);
+                this.updateCustomerQueue();
+            }
+
+            updateCustomers() {
+                let customersToRemove = [];
+
+                this.customers.forEach(customer => {
+                    customer.timeLeft--;
+
+                    if (customer.timeLeft <= 0) {
+                        customersToRemove.push(customer.id);
+                        this.customersLost++;
+                    }
+                });
+
+                // Remove expired customers
+                customersToRemove.forEach(id => {
+                    this.customers = this.customers.filter(c => c.id !== id);
+                });
+
+                this.updateCustomerQueue();
+                this.updateDisplay();
+            }
+
+            updateCustomerQueue() {
+                const queue = this.elements.customerQueue;
+                const emptyQueue = this.elements.emptyQueue;
+
+                if (this.customers.length === 0) {
+                    queue.innerHTML = '';
+                    emptyQueue.classList.remove('hidden');
+                    return;
+                }
+
+                emptyQueue.classList.add('hidden');
+
+                queue.innerHTML = this.customers.map(customer => {
+                    const isUrgent = customer.timeLeft <= 3;
+                    const statusText = customer.status === 'waiting_coffee' ? 'รอกาแฟ' : 'รอคิดเงิน';
+                    const statusColor = customer.status === 'waiting_coffee' ? 'bg-orange-100 text-orange-800' : 'bg-blue-100 text-blue-800';
+                    const progressPercent = (customer.timeLeft / customer.maxTime) * 100;
+
+                    return `
+ <div class="customer-card bg-white border-2 ${isUrgent ? 'border-red-400 urgent' : 'border-gray-200'} rounded-lg p-4 ${isUrgent ? 'shake-animation' : ''}">
+ <div class="flex justify-between items-center mb-2">
+ <div class="font-semibold text-gray-800">${customer.name}</div>
+ <div class="text-2xl">${customer.status === 'waiting_coffee' ? '☕' : '💰'}</div>
+ </div>
+ <div class="text-sm ${statusColor} px-2 py-1 rounded mb-2">${statusText}</div>
+ <div class="w-full bg-gray-200 rounded-full h-2">
+ <div class="progress-bar h-2 rounded-full ${customer.timeLeft <= 3 ? 'bg-red-500' : 'bg-green-500'}" 
+ style="width: ${progressPercent}%"></div>
+ </div>
+ <div class="text-xs text-gray-600 mt-1">${customer.timeLeft} วินาที</div>
+ </div>
+ `;
+                }).join('');
+            }
+
+            updateDisplay() {
+                this.elements.timeLeft.textContent = this.gameTime;
+                this.elements.score.textContent = this.score;
+                this.elements.coffeeStock.textContent = this.coffeeStock;
+                this.elements.customersServed.textContent = this.customersServed;
+                this.elements.serveCounter.textContent = `เสิร์ฟได้: ${this.coffeeStock} ครั้ง`;
+            }
+
+            prepareAction() {
+                if (this.actionInProgress) return;
+                this.performAction('prepare', 5, () => {
+                    this.coffeeStock += 3;
+                    this.updateDisplay();
+                });
+            }
+
+            serveAction() {
+                if (this.actionInProgress || this.coffeeStock <= 0) return;
+
+                const waitingCustomers = this.customers.filter(c => c.status === 'waiting_coffee');
+                if (waitingCustomers.length === 0) return;
+
+                // Find customer with least time left (most urgent) or first in queue
+                const customerToServe = waitingCustomers.reduce((prev, current) => {
+                    return (prev.timeLeft < current.timeLeft) ? prev : current;
+                });
+
+                this.performAction('serve', 3, () => {
+                    this.coffeeStock--;
+                    customerToServe.status = 'waiting_payment';
+                    customerToServe.timeLeft = 17;
+                    customerToServe.maxTime = 17;
+                    this.updateDisplay();
+                    this.updateCustomerQueue();
+
+                    // Auto-serve next customer if they have less than 3 seconds and we have coffee stock
+                    setTimeout(() => {
+                        const nextUrgentCustomer = this.customers.find(c =>
+                            c.status === 'waiting_coffee' && c.timeLeft <= 3
+                        );
+                        if (nextUrgentCustomer && this.coffeeStock > 0 && !this.actionInProgress) {
+                            this.serveAction();
+                        }
+                    }, 100);
+                });
+            }
+
+            cashierAction() {
+                if (this.actionInProgress) return;
+
+                const paymentCustomer = this.customers.find(c => c.status === 'waiting_payment');
+                if (!paymentCustomer) return;
+
+                this.performAction('cashier', 4, () => {
+                    this.customers = this.customers.filter(c => c.id !== paymentCustomer.id);
+                    this.score++;
+                    this.customersServed++;
+                    this.updateDisplay();
+                    this.updateCustomerQueue();
+                });
+            }
+
+            performAction(actionType, duration, callback) {
+                this.actionInProgress = true;
+                this.disableButtons();
+
+                const actionNames = {
+                    prepare: 'เตรียมของ',
+                    serve: 'เสิร์ฟกาแฟ',
+                    cashier: 'คิดเงิน'
+                };
+
+                let timeLeft = duration;
+                this.elements.actionStatus.textContent = `กำลัง${actionNames[actionType]} (${timeLeft} วินาที)`;
+
+                const actionTimer = setInterval(() => {
+                    timeLeft--;
+                    this.elements.actionStatus.textContent = `กำลัง${actionNames[actionType]} (${timeLeft} วินาที)`;
+
+                    if (timeLeft <= 0) {
+                        clearInterval(actionTimer);
+                        this.actionInProgress = false;
+                        this.elements.actionStatus.textContent = '';
+                        this.enableButtons();
+                        callback();
+                    }
+                }, 1000);
+            }
+
+            disableButtons() {
+                this.elements.prepareBtn.disabled = true;
+                this.elements.serveBtn.disabled = true;
+                this.elements.cashierBtn.disabled = true;
+                this.elements.prepareBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                this.elements.serveBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                this.elements.cashierBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+
+            enableButtons() {
+                this.elements.prepareBtn.disabled = false;
+                this.elements.serveBtn.disabled = false;
+                this.elements.cashierBtn.disabled = false;
+                this.elements.prepareBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                this.elements.serveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                this.elements.cashierBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+
+            endGame() {
+                this.gameRunning = false;
+                clearInterval(this.gameTimer);
+                clearInterval(this.customerSpawnTimer);
+                clearInterval(this.customerUpdateTimer);
+
+                this.elements.finalScore.textContent = this.score;
+                this.elements.finalCustomersServed.textContent = this.customersServed;
+                this.elements.customersLost.textContent = this.customersLost;
+
+                if (this.score >= 15) {
+                    this.elements.endEmoji.textContent = '🏆';
+                } else if (this.score >= 10) {
+                    this.elements.endEmoji.textContent = '🎉';
+                } else if (this.score >= 5) {
+                    this.elements.endEmoji.textContent = '👍';
+                } else {
+                    this.elements.endEmoji.textContent = '😅';
+                }
+
+                let customersLostLevel = '';
+                let customersLostMsg = '';
+                let customersLostMsg2 = '';
+                let customersLostScore = 0;
+
+                if (this.customersServed >= 18) {
+                    customersLostLevel = 'ระดับ 7: ปรมาจารย์ด้านการจัดการ (Management Master - Top Tier)';
+                    customersLostMsg = 'มีทักษะ EF ด้านการจัดการในระดับสูง สามารถรับมือกับทุกสถานการณ์ได้อย่างมั่นใจ จัดการเวลาได้อย่างยอดเยี่ยม และเป็นแบบอย่างที่ดีในการบริหารจัดการ';
+                    customersLostMsg2 = 'รักษามาตรฐานและอาจท้าทายตนเองด้วยการเพิ่มความซับซ้อนของงาน หากเกมมีโหมดที่ยากขึ้น';
+                    customersLostScore = 7;
+                } else if (this.customersServed >= 15) {
+                    customersLostLevel = 'ระดับ 6: ผู้เชี่ยวชาญด้านการจัดการ (Management Expert)';
+                    customersLostMsg = 'มีความเชี่ยวชาญด้านการจัดการเป็นอย่างมาก บริการลูกค้าได้รวดเร็วและราบรื่น มีข้อผิดพลาดน้อย และจัดการงานได้แม่นยำ';
+                    customersLostMsg2 = 'ฝึกฝนเพื่อเพิ่มความเร็วและประสิทธิภาพในการจัดการสถานการณ์ที่ผิดปกติหรือซับซ้อนให้ได้ "เกือบ" สมบูรณ์แบบ';
+                    customersLostScore = 6;
+                } else if (this.customersServed >= 12) {
+                    customersLostLevel = 'ระดับ 5: ผู้จัดการมืออาชีพ (Proactive Manager)';
+                    customersLostMsg = 'มีทักษะ EF ด้านการจัดการที่สูง สามารถวางแผนล่วงหน้าได้อย่างมีกลยุทธ์ และจัดการกับสถานการณ์ที่ซับซ้อนและหลายอย่างพร้อมกันได้ดี';
+                    customersLostMsg2 = 'ทบทวนเกมที่ผ่านมาเพื่อหาจุดที่สามารถประหยัดเวลาได้อีก และฝึกการ "มองเห็น" คิวงานล่วงหน้าหลายชั้น';
+                    customersLostScore = 5;
+                } else if (this.customersServed >= 9) {
+                    customersLostLevel = 'ระดับ 4: ผู้จัดการทั่วไป (Standard Manager)';
+                    customersLostMsg = 'จัดการได้ดี วางแผนและจัดลำดับความสำคัญได้อย่างมีประสิทธิภาพ สามารถตัดสินใจและแก้ปัญหาได้ในระดับที่ดี';
+                    customersLostMsg2 = 'เน้นการเพิ่มความเร็วในการดำเนินการ และลดเวลาที่ใช้ในการเปลี่ยนผ่านระหว่างงานแต่ละประเภท';
+                    customersLostScore = 4;
+                } else if (this.customersServed >= 6) {
+                    customersLostLevel = 'ระดับ 3: ผู้จัดการระดับต้น (Junior Manager)';
+                    customersLostMsg = 'สามารถจัดการงานและคิวลูกค้าได้พอสมควร มีประสิทธิภาพในการบริการลูกค้าในระดับที่ยอมรับได้ แต่ยังอาจมีข้อผิดพลาดเมื่อต้องรับมือกับสถานการณ์ที่มีความซับซ้อน';
+                    customersLostMsg2 = 'ลองฝึกการแก้ไขปัญหาเฉพาะหน้า (Troubleshooting) และปรับแผนเมื่อเกิดเหตุการณ์ไม่คาดคิด';
+                    customersLostScore = 3;
+                } else if (this.customersServed >= 3) {
+                    customersLostLevel = 'ระดับ 2: ผู้เรียนรู้ (Apprentice)';
+                    customersLostMsg = 'เริ่มเข้าใจหลักการจัดการและลำดับความสำคัญได้บ้าง แต่ยังคิดช้าและจัดการเวลาไม่ทันเมื่อสถานการณ์เริ่มซับซ้อน';
+                    customersLostMsg2 = 'ฝึกตัดสินใจให้เร็วขึ้น มองภาพรวมของคิวลูกค้า และระบุงานที่ต้องทำในลำดับถัดไป';
+                    customersLostScore = 2;
+                } else {
+                    customersLostLevel = 'ระดับ 1: มือใหม่ (Novice)';
+                    customersLostMsg = 'ยังต้องเรียนรู้และปรับตัวกับสถานการณ์ที่รวดเร็ว การจัดลำดับความสำคัญยังไม่ชัดเจน ทำให้ลูกค้ารอนานและหลุดไปหลายราย';
+                    customersLostMsg2 = 'ทำความเข้าใจประเภทของงานและฝึกวางแผนล่วงหน้า ลองฝึกจับเวลาและคิดลำดับการทำงานในใจก่อนเริ่มเกม';
+                    customersLostScore = 1;
+                }
+
+                document.getElementById('customersLostLevel').textContent = customersLostLevel;
+                document.getElementById('customersLostMsg').textContent = customersLostMsg;
+                document.getElementById('customersLostMsg2').textContent = customersLostMsg2;
+
+                alert('เกมส์จบแล้ว')
+                scoreGame(customersLostScore, 1)
+
+
+                this.elements.endScreen.classList.remove('hidden');
+
+            }
+
+            restartGame() {
+                this.elements.endScreen.classList.add('hidden');
+                this.elements.startScreen.classList.remove('hidden');
+            }
+        }
+
+
+        // Initialize game when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new TimeCrunchCafe();
+        });
+
+
+    </script>
+    </style>
+</body>
+
+</html>
